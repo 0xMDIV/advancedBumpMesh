@@ -135,3 +135,29 @@ export function loadCustomTexture(file) {
     img.src = url;
   });
 }
+
+/**
+ * Load a texture from a remote URL (e.g. raw GitHub content).
+ */
+export function loadTextureFromUrl(url, name) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const { w, h } = fitDimensions(img.width, img.height);
+      const canvas = makeCanvas(w, h);
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const imageData = canvas.getContext('2d').getImageData(0, 0, w, h);
+      const texture   = new THREE.CanvasTexture(canvas);
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      texture.name = name;
+
+      const thumb = makeCanvas(THUMB);
+      drawCover(thumb.getContext('2d'), img, THUMB);
+
+      resolve({ name, thumbCanvas: thumb, fullCanvas: canvas, texture, imageData, width: w, height: h, isCustom: true });
+    };
+    img.onerror = () => reject(new Error(`Failed to load texture: ${name}`));
+    img.src = url;
+  });
+}
