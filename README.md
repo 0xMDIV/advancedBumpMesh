@@ -1,15 +1,21 @@
-# BumpMesh by CNC Kitchen
+# advancedBumpMesh
 
-**Live:** https://bumpmesh.com  
-**GitHub:** https://github.com/CNCKitchen/stlTexturizer
-**Author:** Stefan Hermann
+**GitHub:** https://github.com/0xMDIV/advancedBumpMesh
+**Based on:** [CNCKitchen/stlTexturizer](https://github.com/CNCKitchen/stlTexturizer) by Stefan Hermann
+**Maintainer:** 0xMDIV
 
 A browser-based tool for applying surface displacement textures to 3D meshes — no installation required.
 
 Load an STL, OBJ, or 3MF file, pick a texture, tune the parameters, and export a new displaced STL ready for slicing.
 
+This is a community fork of the original [stlTexturizer](https://github.com/CNCKitchen/stlTexturizer) that ships additional features whose upstream PRs have not been merged. Licensed under AGPL v3.
+
 ## Recent Updates
 
+- **Community texture repos** — load displacement maps from any public GitHub repo
+- **Multi-upload custom maps** — upload several images at once, switch between them as thumbnails, remove individually
+- **Scrollable preset grid** — caps at 5 rows and scrolls for large texture libraries
+- **Docker & Podman support** — one-command local hosting (see [Run Locally](#run-locally))
 - Smooth masking borders
 - New languages: Italian, Spanish, Portuguese, Japanese, French
 - 2–3× speed improvement
@@ -78,7 +84,7 @@ Load an STL, OBJ, or 3MF file, pick a texture, tune the parameters, and export a
 
 ### Other
 - **Light / Dark theme** — respects OS preference, persisted per browser
-- **Multilingual** — English and German UI with auto-detection
+- **Multilingual** — English, German, Italian, French, Spanish (beta), Portuguese (beta), Japanese (beta) — auto-detected, lazy-loaded per language
 
 ## Usage
 
@@ -130,13 +136,17 @@ Loading textures from third-party repositories is **at your own risk**. BumpMesh
 index.html            # Main entry point
 style.css             # Styles (light / dark theme)
 logo.png              # Favicon & header logo
-CNAME                 # Custom domain (bumpmesh.com)
+CNAME                 # Custom domain
 textures/             # Built-in JPG/PNG displacement map images (24 textures)
+Dockerfile            # Static-server container image
+compose.yaml          # docker compose config
+podman-compose.yaml   # podman compose config
+.env.example          # Sample environment for container port mapping
 js/
   main.js             # App bootstrap & UI wiring
   viewer.js           # Three.js scene / camera / controls
   stlLoader.js        # Binary & ASCII STL parser
-  presetTextures.js   # Built-in texture presets + custom upload
+  presetTextures.js   # Built-in texture presets + custom upload + remote repo loader
   previewMaterial.js  # Three.js material for live & displacement preview
   mapping.js          # UV projection logic (7 modes)
   displacement.js     # Vertex displacement baking
@@ -144,7 +154,8 @@ js/
   decimation.js       # QEM mesh decimation
   exclusion.js        # Face exclusion / inclusion painting
   exporter.js         # Binary STL export
-  i18n.js             # Translations (EN / DE)
+  i18n.js             # Language loader (lazy-loads per-language files, falls back to English)
+  i18n/               # Per-language translation files (en, de, it, fr, es, pt, ja)
 ```
 
 ## Run Locally
@@ -153,11 +164,23 @@ All processing runs entirely in the browser — no backend or build step is need
 
 ```bash
 # Clone the repository
-git clone https://github.com/CNCKitchen/stlTexturizer.git
-cd stlTexturizer
+git clone https://github.com/0xMDIV/advancedBumpMesh.git
+cd advancedBumpMesh
 ```
 
 Then start any static file server from the project root. Pick whichever you have installed:
+
+**Docker**
+```bash
+cp .env.example .env   # optional — change the host port
+docker compose up -d
+```
+
+**Podman**
+```bash
+cp .env.example .env   # optional — change the host port
+podman compose -f podman-compose.yaml up -d
+```
 
 **Python (3.x)**
 ```bash
